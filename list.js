@@ -1,22 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
+  let currentDate = Date.now();
   const list = document.querySelector("#todo_list");
-  let tasks = [
-    {
-      id: 1,
-      description: "Code todo list",
-      dueDate: "30/11/2023",
-    },
-    {
-      id: 2,
-      description: "Code React",
-      dueDate: "1/12/2023",
-    },
-  ];
-
-  localStorage.setItem("task-Lisk", JSON.stringify(tasks));
-
-  const taskList = JSON.parse(localStorage.getItem("task-list"));
-  console.log(taskList);
+  let tasks = JSON.parse(localStorage.getItem("task-list")) || [];
 
   const renderTodoItem = function (id, description, dueDate) {
     const newTodoItem = document.createElement("li");
@@ -161,6 +146,8 @@ document.addEventListener("DOMContentLoaded", function () {
             description: descriptionInputValue,
             dueDate: dateInputValue,
           });
+
+          localStorage.setItem("task-list", JSON.stringify(tasks));
 
           // Re-render the updated tasks
           renderTasks();
