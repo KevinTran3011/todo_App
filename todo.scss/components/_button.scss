@@ -1,0 +1,31 @@
+@use "../abstract/color" as *;
+
+.modified_button {
+  border: 4px;
+  align-self: center;
+  justify-content: center;
+  color: $title_color;
+  border: 5px solid $font_color;
+  border-radius: 5px;
+
+  &--delete {
+    @extend .modified_button;
+    background-color: $red;
+
+    &_all {
+      @extend .modified_button--delete;
+      height: 40px;
+      width: 500px;
+    }
+  }
+  &--completed {
+    @extend .modified_button;
+
+    background-color: $green;
+  }
+  &--add {
+    color: $green;
+    background-color: $title_color;
+    border-radius: 4px;
+  }
+}

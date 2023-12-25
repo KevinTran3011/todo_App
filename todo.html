@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To Do List</title>
+    <link
+      href="https://fonts.googleapis.com/css?family=Plus Jakarta Sans"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <link rel="stylesheet" href="todo.scss/main.css" />
+  </head>
+  <body>
+    <div class="content">
+      <div class="container-fluid">
+        <div class="title_container"><div class="title">To Do</div></div>
+
+        <div class="todo_container">
+          <div class="addList_section">
+            <input
+              class="addList_section--input"
+              type="text"
+              placeholder="Add task here"
+            />
+          </div>
+
+          <li class="todo_list--header">
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <div class="header">Index</div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4">
+              <div class="header">Task</div>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <div class="header">Due Date</div>
+            </div>
+
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <div class="header">Completed</div>
+            </div>
+            <div class="col-lg-2 col-md-2 col-sm-2">
+              <div class="header">Delete</div>
+            </div>
+          </li>
+          <ul class="todo_list" id="todo_list"></ul>
+          <div class="todo_list--delete">
+            <button class="modified_button--delete_all" id="delete_All">
+              <span class="material-symbols-outlined"> delete_forever </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="list.js"></script>
+  </body>
+</html>

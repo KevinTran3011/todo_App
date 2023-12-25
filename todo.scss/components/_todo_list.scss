@@ -1,0 +1,39 @@
+@use "../abstract/color" as *;
+@use "../abstract/mixin" as *;
+
+.todo_container {
+  border-radius: 4px;
+  border: 5px solid $title_color;
+  padding: 15px;
+  gap: 30px;
+}
+
+.todo_list {
+  background-color: $list_color;
+  padding: 15px;
+
+  &--header {
+    @extend .todo_list;
+    @include flex_center;
+  }
+
+  &--item {
+    @extend .todo_list;
+    @include flex_center;
+    background-color: $task_color;
+    border: 5px solid $title_color;
+    margin-bottom: 15px;
+    &_finished {
+      @extend .todo_list--item;
+      color: $list_color;
+      background-color: $font_color;
+      opacity: 0.5;
+      text-decoration: line-through;
+    }
+  }
+
+  &--delete {
+    @include flex_center;
+    justify-content: center;
+  }
+}

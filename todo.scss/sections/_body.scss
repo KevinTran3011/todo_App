@@ -1,0 +1,10 @@
+@use "../abstract/color" as *;
+
+body {
+  background-color: $background_color;
+}
+
+.content {
+  margin: 30px;
+  padding: 15px;
+}

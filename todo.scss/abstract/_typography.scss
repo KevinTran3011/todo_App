@@ -1,0 +1,37 @@
+@use "../abstract/color" as *;
+
+$font: Plus Jakarta Sans !default;
+$font-size: 14px !default;
+$font-weight: 400 !default;
+$line-height: 140% !default;
+$letter-spacing: 0.4 !default;
+
+body {
+  font-family: $font;
+  color: $font_color;
+  font-size: $font-size;
+  font-weight: $font-weight;
+  line-height: $line-height;
+  letter-spacing: $letter-spacing;
+}
+
+.title {
+  font-size: 24px;
+  color: $title_color;
+  font-weight: 600;
+}
+
+.header {
+  font-weight: 600;
+  color: $title_color;
+}
+
+.input_Form {
+  font-size: 21px;
+  color: $title_color;
+  font-weight: 600;
+  &--header {
+    @extend .input_Form;
+    font-size: 50px;
+  }
+}

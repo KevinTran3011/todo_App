@@ -1,0 +1,7 @@
+@use "../abstract/mixin" as *;
+
+.title_container {
+  @include flex_center;
+  margin-bottom: 30px;
+  justify-content: center;
+}

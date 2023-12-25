@@ -1,0 +1,15 @@
+@use "../abstract/color" as *;
+@use "../abstract/mixin" as *;
+
+.addList_section {
+  @include flex_center;
+  justify-content: center;
+  margin-bottom: 15px;
+
+  &--input {
+    border-radius: 4px;
+    border: 1px solid $title_color;
+    height: 40px;
+    width: 500px;
+  }
+}
