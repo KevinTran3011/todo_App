@@ -4,9 +4,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const list = document.querySelector("#todo_list");
   let tasks = JSON.parse(localStorage.getItem("task-list")) || [];
 
-  const renderTodoItem = function (id, description, dueDate) {
+  const renderTodoItem = function (id, description, dueDate, isCompleted) {
     const newTodoItem = document.createElement("li");
-    newTodoItem.classList.add("todo_list--item");
+    const itemClass = isCompleted
+      ? "todo_list--item_finished"
+      : "todo_list--item";
+    newTodoItem.classList.add(itemClass);
     newTodoItem.setAttribute("data-id", id);
 
     newTodoItem.innerHTML = `
@@ -24,9 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <span class="material-symbols-outlined"> delete </span>
         </button>
       </div>
-    
     </div>
-
     `;
 
     return newTodoItem;
@@ -36,7 +37,12 @@ document.addEventListener("DOMContentLoaded", function () {
     list.innerHTML = "";
 
     tasks.forEach((task) => {
-      const todoItem = renderTodoItem(task.id, task.description, task.dueDate);
+      const todoItem = renderTodoItem(
+        task.id,
+        task.description,
+        task.dueDate,
+        task.isCompleted
+      );
       list.appendChild(todoItem);
 
       // Add click event listener for delete button
@@ -61,22 +67,16 @@ document.addEventListener("DOMContentLoaded", function () {
     renderTasks();
   };
 
-  let isCompleted = false;
   const completeTask = (id) => {
     tasks.forEach((task) => {
       if (task.id === id) {
+        task.isCompleted = !task.isCompleted;
         const todoItem = document.querySelector(
           `#todo_list li[data-id="${id}"]`
         );
-        if (!isCompleted) {
-          todoItem.classList.remove("todo_list--item");
-          todoItem.classList.add("todo_list--item_finished");
-          isCompleted = true;
-        } else {
-          todoItem.classList.remove("todo_list--item_finished");
-          todoItem.classList.add("todo_list--item");
-          isCompleted = false;
-        }
+        todoItem.classList.toggle("todo_list--item");
+        todoItem.classList.toggle("todo_list--item_finished");
+        localStorage.setItem("task-list", JSON.stringify(tasks));
       }
     });
   };
@@ -147,6 +147,7 @@ document.addEventListener("DOMContentLoaded", function () {
             id: tasks.length + 1,
             description: descriptionInputValue,
             dueDate: dateInputValue,
+            isCompleted: false,
           });
 
           localStorage.setItem("task-list", JSON.stringify(tasks));
@@ -174,15 +175,31 @@ document.addEventListener("DOMContentLoaded", function () {
     renderTasks();
   });
 
+  // REFORMAT DATE TIME
+  const reformatDate = (date) => {
+    return [date.getDay(), date.getMonth(), date.getFullYear()].join("/");
+  };
+
+  // SORT BY DATE TIME CLOSEST TO THE CURRENT DATE
+  let isSorted = false;
+
   sortButton.addEventListener("click", function () {
-    tasks = tasks.sort((a, b) => {
-      let date1 = new Date(a.dueDate);
-      let minus1 = date1 - currentDate;
-      let date2 = new Date(b.dueDate);
-      let minus2 = date2 - currentDate;
-      return minus2 - minus1;
-    });
-    console.log(tasks);
+    if (isSorted) {
+      tasks = tasks.reverse();
+      isSorted = false;
+    } else {
+      tasks = tasks.sort((a, b) => {
+        let date1 = new Date(a.dueDate);
+        let diff1 = Math.abs(date1 - currentDate);
+
+        let date2 = new Date(b.dueDate);
+        let diff2 = Math.abs(date2 - currentDate);
+
+        return diff1 - diff2;
+      });
+
+      isSorted = true;
+    }
 
     localStorage.setItem("task-list", JSON.stringify(tasks));
     renderTasks();

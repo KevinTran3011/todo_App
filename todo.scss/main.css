@@ -137,6 +137,12 @@ body {
   flex-direction: row;
 }
 
+.search_input {
+  border-radius: 50px;
+  height: 40px;
+  width: 200px;
+}
+
 body {
   background-color: #d8cfff;
 }
