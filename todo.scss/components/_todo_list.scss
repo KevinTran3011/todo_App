@@ -27,7 +27,6 @@
       @extend .todo_list--item;
       color: $list_color;
       background-color: $font_color;
-      opacity: 0.5;
       text-decoration: line-through;
     }
   }

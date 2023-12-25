@@ -63,6 +63,9 @@ body {
   height: 40px;
   width: 500px;
 }
+.addList_section #addTask {
+  height: 50px;
+}
 
 .todo_container {
   border-radius: 4px;
@@ -89,7 +92,6 @@ body {
 .todo_list--item_finished {
   color: #d8dcff;
   background-color: #333333;
-  opacity: 0.5;
   text-decoration: line-through;
 }
 .todo_list--delete {
@@ -109,7 +111,7 @@ body {
   display: flex;
   align-items: center;
   position: fixed;
-  background-color: rgba(216, 207, 255, 0.9);
+  background-color: #d8cfff;
   gap: 50px;
   width: 100vw;
   height: 100vh;

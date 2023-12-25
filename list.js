@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
-  let currentDate = Date.now();
+  let currentDate = new Date();
+  let sortButton = document.getElementById("sort_button");
   const list = document.querySelector("#todo_list");
   let tasks = JSON.parse(localStorage.getItem("task-list")) || [];
 
@@ -56,6 +57,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const deleteTask = (id) => {
     tasks = tasks.filter((task) => task.id !== id);
+    localStorage.setItem("task-list", JSON.stringify(tasks));
     renderTasks();
   };
 
@@ -81,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // FOR THE INPUT FORM
   let formIsOpen = false;
-  const inputField = document.querySelector(".addList_section--input");
+  const inputField = document.getElementById("addTask");
   inputField.addEventListener("click", function () {
     if (!formIsOpen) {
       const inputForm = document.createElement("div");
@@ -156,6 +158,10 @@ document.addEventListener("DOMContentLoaded", function () {
           descriptionInputField.value = "";
           inputForm.remove();
           formIsOpen = false;
+        } else if (descriptionInputValue === "") {
+          alert("Description field missing");
+        } else if (dateInputValue === "") {
+          alert("Date missing");
         }
       });
     }
@@ -164,6 +170,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const deleteAllButton = document.getElementById("delete_All");
   deleteAllButton.addEventListener("click", function () {
     tasks = [];
+    localStorage.setItem("task-list", JSON.stringify(tasks));
+    renderTasks();
+  });
+
+  sortButton.addEventListener("click", function () {
+    tasks = tasks.sort((a, b) => {
+      let date1 = new Date(a.dueDate);
+      let minus1 = date1 - currentDate;
+      let date2 = new Date(b.dueDate);
+      let minus2 = date2 - currentDate;
+      return minus2 - minus1;
+    });
+    console.log(tasks);
+
+    localStorage.setItem("task-list", JSON.stringify(tasks));
     renderTasks();
   });
 });
