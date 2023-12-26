@@ -5,9 +5,10 @@
   @include flex_center;
   border-radius: 50px;
   height: 40px;
-  width: 200px;
+  width: 220px;
   background-color: $title_color;
   margin-bottom: 15px;
+  padding: 5px;
   input {
     border: none;
     background-color: transparent;
@@ -16,13 +17,13 @@
     color: $font_color;
     outline: none;
   }
-  &:focus {
-    border: 2px solid $title_color;
-  }
 
   #search_icon {
     color: $font_color;
     font-size: 20px;
     justify-self: flex-end;
+    border-radius: 100%;
+    padding: 5px;
+    background-color: $list_color;
   }
 }

@@ -14,6 +14,7 @@ body {
 }
 
 .header {
+  font-size: 20px;
   font-weight: 600;
   color: #fff;
 }
@@ -131,6 +132,7 @@ body {
 }
 .inputForm .input_section input, .inputForm .input_section--date input, .inputForm .input_section--description input {
   border-radius: 50px;
+  outline: none;
 }
 .inputForm .input_section input:focus, .inputForm .input_section--date input:focus, .inputForm .input_section--description input:focus {
   border: 5px solid #fff;
@@ -156,9 +158,10 @@ body {
   align-items: center;
   border-radius: 50px;
   height: 40px;
-  width: 200px;
+  width: 220px;
   background-color: #fff;
   margin-bottom: 15px;
+  padding: 5px;
 }
 .search_bar input {
   border: none;
@@ -168,13 +171,13 @@ body {
   color: #333333;
   outline: none;
 }
-.search_bar:focus {
-  border: 2px solid #fff;
-}
 .search_bar #search_icon {
   color: #333333;
   font-size: 20px;
   justify-self: flex-end;
+  border-radius: 100%;
+  padding: 5px;
+  background-color: #d8dcff;
 }
 
 body {

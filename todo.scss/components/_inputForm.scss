@@ -24,6 +24,7 @@
 
     input {
       border-radius: 50px;
+      outline: none;
 
       &:focus {
         border: 5px solid $title_color;
