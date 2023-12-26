@@ -123,23 +123,58 @@ body {
   top: 0;
   z-index: 999;
 }
-.inputForm .input_section {
+.inputForm .input_section, .inputForm .input_section--date, .inputForm .input_section--description {
   display: flex;
   align-items: center;
-  gap: 50px;
   justify-content: center;
   justify-self: center;
+}
+.inputForm .input_section input, .inputForm .input_section--date input, .inputForm .input_section--description input {
+  border-radius: 50px;
+}
+.inputForm .input_section input:focus, .inputForm .input_section--date input:focus, .inputForm .input_section--description input:focus {
+  border: 5px solid #fff;
+}
+.inputForm .input_section--description {
+  flex-direction: column;
+  gap: 15px;
+  border-radius: 50px;
+}
+.inputForm .input_section--date {
+  flex-direction: column;
+  gap: 15px;
 }
 .inputForm .input_section--button {
   display: flex;
   align-items: center;
   flex-direction: row;
+  gap: 15px;
 }
 
-.search_input {
+.search_bar {
+  display: flex;
+  align-items: center;
   border-radius: 50px;
   height: 40px;
   width: 200px;
+  background-color: #fff;
+  margin-bottom: 15px;
+}
+.search_bar input {
+  border: none;
+  background-color: transparent;
+  height: 100%;
+  font-size: 16px;
+  color: #333333;
+  outline: none;
+}
+.search_bar:focus {
+  border: 2px solid #fff;
+}
+.search_bar #search_icon {
+  color: #333333;
+  font-size: 20px;
+  justify-self: flex-end;
 }
 
 body {

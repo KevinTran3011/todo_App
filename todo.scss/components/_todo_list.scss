@@ -23,6 +23,7 @@
     background-color: $task_color;
     border: 5px solid $title_color;
     margin-bottom: 15px;
+
     &_finished {
       @extend .todo_list--item;
       color: $list_color;

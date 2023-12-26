@@ -25,8 +25,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     newTodoItem.innerHTML = `
     <div class="col-lg-2 col-md-2 col-sm-2">${id}</div>
-    <div class="col-lg-4 col-md-4 col-sm-4">${description}</div>
-    <div class="col-lg-2 col-md-2 col-sm-2">${reformattedDate}</div>
+    <div class="col-lg-3 col-md-3 col-sm-3">${description}</div>
+    <div class="col-lg-3 col-md-3 col-sm-3">${reformattedDate}</div>
     <div class="col-lg-2 col-md-2 col-sm-2">
       <button class="modified_button--completed">
         <span class="material-symbols-outlined"> done </span>
@@ -108,10 +108,10 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class = 'inputForm'>
         <div class = 'input_Form--header'>ADD A TASK</div>
           <div class = 'input_section--description'>
-          <div class = 'input_Form '>Description</div>
-          <input type="text" class="addList_section--input"  id = 'descriptionInput' placeholder="Add a new task">
+              <div class = 'input_Form '>Description</div>
+              <input type="text" class="addList_section--input"  id = 'descriptionInput' placeholder="Add a new task">
 
-        </div>
+           </div>
 
         <div class = 'input_section--date'>
             <div class = 'input_Form '>Due Date</div>

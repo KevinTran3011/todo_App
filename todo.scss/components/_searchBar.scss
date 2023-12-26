@@ -1,0 +1,28 @@
+@use "../abstract/mixin" as *;
+@use "../abstract/color" as *;
+
+.search_bar {
+  @include flex_center;
+  border-radius: 50px;
+  height: 40px;
+  width: 200px;
+  background-color: $title_color;
+  margin-bottom: 15px;
+  input {
+    border: none;
+    background-color: transparent;
+    height: 100%;
+    font-size: 16px;
+    color: $font_color;
+    outline: none;
+  }
+  &:focus {
+    border: 2px solid $title_color;
+  }
+
+  #search_icon {
+    color: $font_color;
+    font-size: 20px;
+    justify-self: flex-end;
+  }
+}

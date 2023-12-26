@@ -19,19 +19,34 @@
 
   .input_section {
     @include flex_center;
-    gap: 50px;
     justify-content: center;
     justify-self: center;
+
+    input {
+      border-radius: 50px;
+
+      &:focus {
+        border: 5px solid $title_color;
+      }
+    }
+
+    &--description {
+      @extend .input_section;
+      flex-direction: column;
+      gap: 15px;
+      border-radius: 50px;
+    }
+
+    &--date {
+      @extend .input_section;
+      flex-direction: column;
+      gap: 15px;
+    }
   }
 
   .input_section--button {
     @include flex_center;
     flex-direction: row;
+    gap: 15px;
   }
-}
-
-.search_input {
-  border-radius: 50px;
-  height: 40px;
-  width: 200px;
 }
