@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-  let currentDate = new Date();
   let sortButton = document.getElementById("sort_button");
   const list = document.querySelector("#todo_list");
   let tasks = JSON.parse(localStorage.getItem("task-list")) || [];
@@ -47,31 +46,37 @@ document.addEventListener("DOMContentLoaded", function () {
   const renderTasks = function () {
     list.innerHTML = "";
 
-    tasks.forEach((task) => {
-      const todoItem = renderTodoItem(
-        task.id,
-        task.description,
-        task.dueDate,
-        task.isCompleted
-      );
-      list.appendChild(todoItem);
+    // Reverse the tasks array to display new tasks at the top
+    tasks
+      .slice()
+      .reverse()
+      .forEach((task) => {
+        const todoItem = renderTodoItem(
+          task.id,
+          task.description,
+          task.dueDate,
+          task.isCompleted
+        );
 
-      // Add click event listener for delete button
-      const deleteButton = todoItem.querySelector(".modified_button--delete");
-      deleteButton.addEventListener("click", function () {
-        deleteTask(task.id);
-      });
+        // Prepend new tasks instead of appending
+        list.insertBefore(todoItem, list.firstChild);
 
-      const completeButton = todoItem.querySelector(
-        ".modified_button--completed"
-      );
-      completeButton.addEventListener("click", function () {
-        completeTask(task.id);
+        // Add click event listener for delete button
+        const deleteButton = todoItem.querySelector(".modified_button--delete");
+        deleteButton.addEventListener("click", function () {
+          deleteTask(task.id);
+        });
+
+        const completeButton = todoItem.querySelector(
+          ".modified_button--completed"
+        );
+        completeButton.addEventListener("click", function () {
+          completeTask(task.id);
+        });
       });
-    });
   };
-  renderTasks();
 
+  renderTasks();
   const deleteTask = (id) => {
     tasks = tasks.filter((task) => task.id !== id);
     localStorage.setItem("task-list", JSON.stringify(tasks));
@@ -157,8 +162,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const descriptionInputValue = descriptionInputField.value.trim();
         const dateInputValue = dateInputField.value.trim();
         if (descriptionInputValue !== "" && dateInputValue !== "") {
-          // Add a new task
-          tasks.push({
+          // Add a new task at the beginning of the tasks array
+          tasks.unshift({
             id: tasks.length + 1,
             description: descriptionInputValue,
             dueDate: dateInputValue,
@@ -192,7 +197,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // SORT BY DATE TIME CLOSEST TO THE CURRENT DATE
   let isSorted = false;
-
   sortButton.addEventListener("click", function () {
     if (isSorted) {
       tasks = tasks.reverse();
@@ -200,30 +204,33 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       tasks = tasks.sort((a, b) => {
         let date1 = new Date(a.dueDate);
-        let diff1 = Math.abs(date1 - currentDate);
-
         let date2 = new Date(b.dueDate);
-        let diff2 = Math.abs(date2 - currentDate);
 
-        return diff1 - diff2;
+        if (date1 > date2) {
+          return 1;
+        } else if (date1 < date2) {
+          return -1;
+        }
+
+        return 0;
       });
 
       isSorted = true;
     }
 
-    localStorage.setItem("task-list", JSON.stringify(tasks));
     renderTasks();
   });
 
   // FOR THE SEARCH BAR
 
-  const searchBar = document.getElementById("searchBar");
+  const searchBar = document.getElementById("search-Bar");
   searchBar.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       if (e.target.value === "") {
         tasks = JSON.parse(localStorage.getItem("task-list")) || [];
         renderTasks();
       }
+
       const searchString = e.target.value.toLowerCase();
       const filteredTasks = tasks.filter((task) => {
         return task.description.toLowerCase().includes(searchString);
