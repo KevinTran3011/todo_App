@@ -4,18 +4,29 @@ document.addEventListener("DOMContentLoaded", function () {
   const list = document.querySelector("#todo_list");
   let tasks = JSON.parse(localStorage.getItem("task-list")) || [];
 
+  // REFORMAT DATE TIME
+  const reformatDate = (dueDate) => {
+    const date = new Date(dueDate);
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const renderTodoItem = function (id, description, dueDate, isCompleted) {
     const newTodoItem = document.createElement("li");
+    const reformattedDate = reformatDate(dueDate);
     const itemClass = isCompleted
       ? "todo_list--item_finished"
       : "todo_list--item";
+
     newTodoItem.classList.add(itemClass);
     newTodoItem.setAttribute("data-id", id);
 
     newTodoItem.innerHTML = `
     <div class="col-lg-2 col-md-2 col-sm-2">${id}</div>
     <div class="col-lg-4 col-md-4 col-sm-4">${description}</div>
-    <div class="col-lg-2 col-md-2 col-sm-2">${dueDate}</div>
+    <div class="col-lg-2 col-md-2 col-sm-2">${reformattedDate}</div>
     <div class="col-lg-2 col-md-2 col-sm-2">
       <button class="modified_button--completed">
         <span class="material-symbols-outlined"> done </span>
@@ -74,8 +85,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const todoItem = document.querySelector(
           `#todo_list li[data-id="${id}"]`
         );
+        const completeButton = todoItem.querySelector(
+          ".modified_button--completed"
+        );
         todoItem.classList.toggle("todo_list--item");
         todoItem.classList.toggle("todo_list--item_finished");
+
         localStorage.setItem("task-list", JSON.stringify(tasks));
       }
     });
@@ -175,11 +190,6 @@ document.addEventListener("DOMContentLoaded", function () {
     renderTasks();
   });
 
-  // REFORMAT DATE TIME
-  const reformatDate = (date) => {
-    return [date.getDay(), date.getMonth(), date.getFullYear()].join("/");
-  };
-
   // SORT BY DATE TIME CLOSEST TO THE CURRENT DATE
   let isSorted = false;
 
@@ -203,5 +213,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     localStorage.setItem("task-list", JSON.stringify(tasks));
     renderTasks();
+  });
+
+  // FOR THE SEARCH BAR
+
+  const searchBar = document.getElementById("searchBar");
+  searchBar.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      if (e.target.value === "") {
+        tasks = JSON.parse(localStorage.getItem("task-list")) || [];
+        renderTasks();
+      }
+      const searchString = e.target.value.toLowerCase();
+      const filteredTasks = tasks.filter((task) => {
+        return task.description.toLowerCase().includes(searchString);
+      });
+      tasks = filteredTasks;
+      renderTasks();
+    }
   });
 });

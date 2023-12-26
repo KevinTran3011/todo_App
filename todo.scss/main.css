@@ -27,7 +27,7 @@ body {
   font-size: 50px;
 }
 
-.modified_button, .modified_button--completed, .modified_button--delete, .modified_button--delete_all {
+.modified_button, .modified_button--sort, .modified_button--completed, .modified_button--delete, .modified_button--delete_all {
   border: 4px;
   align-self: center;
   justify-content: center;
@@ -50,7 +50,6 @@ body {
   background-color: #fff;
   border-radius: 4px;
 }
-
 .addList_section {
   display: flex;
   align-items: center;
@@ -150,4 +149,10 @@ body {
 .content {
   margin: 30px;
   padding: 15px;
+}
+
+#due_date {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
 }/*# sourceMappingURL=main.css.map */

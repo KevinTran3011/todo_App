@@ -33,13 +33,13 @@
               <span class="header">Add task here</span>
             </button>
           </div>
-          <div class="sort_section" id="sort_button">
-            <button class="modified_button--sort">
-              <span class="material-symbols-outlined"> sort </span>
-            </button>
-          </div>
+
           <div class="search_bar">
-            <input class="search_input" placeholder="Search task" />
+            <input
+              class="search_input"
+              placeholder="Search task"
+              id="searchBar"
+            />
             <span
               class="material-symbols-outlined"
               style="border-radius: 100%; background-color: white"
@@ -55,8 +55,13 @@
             <div class="col-lg-4 col-md-4 col-sm-4">
               <div class="header">Task</div>
             </div>
-            <div class="col-lg-2 col-md-2 col-sm-2">
+            <div class="col-lg-2 col-md-2 col-sm-2" id="due_date">
               <div class="header">Due Date</div>
+              <div class="sort_section" id="sort_button">
+                <button class="modified_button--sort">
+                  <span class="material-symbols-outlined"> sort </span>
+                </button>
+              </div>
             </div>
 
             <div class="col-lg-2 col-md-2 col-sm-2">

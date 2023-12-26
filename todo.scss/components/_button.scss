@@ -28,4 +28,8 @@
     background-color: $title_color;
     border-radius: 4px;
   }
+
+  &--sort {
+    @extend .modified_button;
+  }
 }
