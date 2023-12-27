@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             ".modified_button--completed"
           );
           completeButton.addEventListener("click", function () {
-            completeTask(task.id);
+            completeTask(task);
           });
         });
     } catch (error) {
@@ -131,17 +131,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   };
 
-  const completeTask = async (id) => {
+  const completeTask = async (task) => {
     try {
-      const selectedTask = await fetch(
-        `https://658a8a68ba789a9622374750.mockapi.io/tasks/${id}`
-      );
-      if (!selectedTask.ok) {
-        throw new Error("Cannot fetch the task");
-      }
-      const task = await selectedTask.json();
-      const isCompleted = task.isCompleted;
-
+      const { id, isCompleted } = task;
       const response = await fetch(
         `https://658a8a68ba789a9622374750.mockapi.io/tasks/${id}`,
         {
@@ -255,17 +247,36 @@ document.addEventListener("DOMContentLoaded", async function () {
       );
       const data = await response.json();
       console.log(data);
-      tasks.push(data);
+      tasks.unshift(data);
       renderTasks();
     } catch (err) {
       console.log("Error occured:" + err.message);
     }
   };
-
+  // DELETE ALL TASKS
+  const deleteAll = async () => {
+    try {
+      for (const task of tasks) {
+        const response = await fetch(
+          `https://658a8a68ba789a9622374750.mockapi.io/tasks/${task.id}`,
+          {
+            method: "DELETE",
+            headers: { "content-type": "application/json" },
+          }
+        );
+        if (!response.ok) {
+          throw new Error(`Failed to delete task with id ${task.id}`);
+        }
+      }
+      tasks = [];
+      renderTasks();
+    } catch (err) {
+      console.log("Error occurred while deleting all tasks: " + err.message);
+    }
+  };
   const deleteAllButton = document.getElementById("delete_All");
   deleteAllButton.addEventListener("click", function () {
-    tasks = [];
-    renderTasks();
+    deleteAll();
   });
 
   // SORT BY DATE TIME
@@ -273,7 +284,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   let isSorted = false;
   sortButton.addEventListener("click", async function () {
     if (!isSorted) {
-      tasks = sortFunction([...tasks]); // create a copy of tasks before sorting
+      tasks = sortFunction([...tasks]);
       renderTasks();
       isSorted = true;
     } else {
@@ -282,8 +293,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       isSorted = false;
     }
   });
-
-  // Adjusted sort function using localeCompare
 
   const sortFunction = (tasks) => {
     return tasks.sort((a, b) => new Date(b.dueDate) - new Date(a.dueDate));
