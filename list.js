@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
   let sortButton = document.getElementById("sort_button");
   const list = document.querySelector("#todo_list");
-  let tasks = JSON.parse(localStorage.getItem("task-list")) || [];
 
   // REFORMAT DATE TIME
   const reformatDate = (dueDate) => {
@@ -12,7 +11,30 @@ document.addEventListener("DOMContentLoaded", function () {
     return `${day}/${month}/${year}`;
   };
 
-  const renderTodoItem = function (id, description, dueDate, isCompleted) {
+  const tasks = async () => {
+    try {
+      const response = await fetch(
+        "https://658a8a68ba789a9622374750.mockapi.io/tasks",
+        {
+          method: "GET",
+          headers: { "content-type": "application/json" },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Cannot fetch the data");
+      }
+
+      const data = await response.json();
+      console.log(data);
+      return data;
+    } catch (error) {
+      console.error(error.message);
+      throw error; // rethrow the error to handle it at a higher level if needed
+    }
+  };
+
+  const renderTodoItem = (id, description, dueDate, isCompleted) => {
     const newTodoItem = document.createElement("li");
     const reformattedDate = reformatDate(dueDate);
     const itemClass = isCompleted
@@ -23,82 +45,109 @@ document.addEventListener("DOMContentLoaded", function () {
     newTodoItem.setAttribute("data-id", id);
 
     newTodoItem.innerHTML = `
-    <div class="col-lg-2 col-md-2 col-sm-2">${id}</div>
-    <div class="col-lg-3 col-md-3 col-sm-3">${description}</div>
-    <div class="col-lg-3 col-md-3 col-sm-3">${reformattedDate}</div>
-    <div class="col-lg-2 col-md-2 col-sm-2">
-      <button class="modified_button--completed">
-        <span class="material-symbols-outlined"> done </span>
-      </button>
-    </div>
-    <div class="delete_button">
+      <div class="col-lg-2 col-md-2 col-sm-2">${id}</div>
+      <div class="col-lg-3 col-md-3 col-sm-3">${description}</div>
+      <div class="col-lg-3 col-md-3 col-sm-3">${reformattedDate}</div>
       <div class="col-lg-2 col-md-2 col-sm-2">
-        <button class="modified_button--delete">
-          <span class="material-symbols-outlined"> delete </span>
+        <button class="modified_button--completed">
+          <span class="material-symbols-outlined"> done </span>
         </button>
       </div>
-    </div>
+      <div class="delete_button">
+        <div class="col-lg-2 col-md-2 col-sm-2">
+          <button class="modified_button--delete">
+            <span class="material-symbols-outlined"> delete </span>
+          </button>
+        </div>
+      </div>
     `;
 
     return newTodoItem;
   };
 
-  const renderTasks = function () {
-    list.innerHTML = "";
+  const renderTasks = async () => {
+    try {
+      const tasksData = await tasks();
+      const list = document.querySelector("#todo_list");
+      list.innerHTML = "";
 
-    // Reverse the tasks array to display new tasks at the top
-    tasks
-      .slice()
-      .reverse()
-      .forEach((task) => {
-        const todoItem = renderTodoItem(
-          task.id,
-          task.description,
-          task.dueDate,
-          task.isCompleted
-        );
+      tasksData
+        .slice()
+        .reverse()
+        .forEach((task) => {
+          const { id, description, dueDate, isCompleted } = task;
+          const todoItem = renderTodoItem(
+            id,
+            description,
+            dueDate,
+            isCompleted
+          );
+          list.insertBefore(todoItem, list.firstChild);
 
-        // Prepend new tasks instead of appending
-        list.insertBefore(todoItem, list.firstChild);
+          const deleteButton = todoItem.querySelector(
+            ".modified_button--delete"
+          );
+          deleteButton.addEventListener("click", function () {
+            deleteTask(task.id);
+          });
 
-        // Add click event listener for delete button
-        const deleteButton = todoItem.querySelector(".modified_button--delete");
-        deleteButton.addEventListener("click", function () {
-          deleteTask(task.id);
+          const completeButton = todoItem.querySelector(
+            ".modified_button--completed"
+          );
+          completeButton.addEventListener("click", function () {
+            completeTask(task.id);
+          });
         });
-
-        const completeButton = todoItem.querySelector(
-          ".modified_button--completed"
-        );
-        completeButton.addEventListener("click", function () {
-          completeTask(task.id);
-        });
-      });
+    } catch (error) {
+      console.error("Error rendering tasks:", error.message);
+    }
   };
 
   renderTasks();
-  const deleteTask = (id) => {
-    tasks = tasks.filter((task) => task.id !== id);
-    localStorage.setItem("task-list", JSON.stringify(tasks));
-    renderTasks();
+
+  const deleteTask = async (id) => {
+    try {
+      const response = await fetch(
+        `https://658a8a68ba789a9622374750.mockapi.io/tasks/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      renderTasks();
+    } catch (err) {
+      console.log("Error occured while deleting the task" + err.message);
+    }
   };
 
-  const completeTask = (id) => {
-    tasks.forEach((task) => {
-      if (task.id === id) {
-        task.isCompleted = !task.isCompleted;
-        const todoItem = document.querySelector(
-          `#todo_list li[data-id="${id}"]`
-        );
-        const completeButton = todoItem.querySelector(
-          ".modified_button--completed"
-        );
-        todoItem.classList.toggle("todo_list--item");
-        todoItem.classList.toggle("todo_list--item_finished");
-
-        localStorage.setItem("task-list", JSON.stringify(tasks));
+  const completeTask = async (id) => {
+    try {
+      const taskResponse = await fetch(
+        `https://658a8a68ba789a9622374750.mockapi.io/tasks/${id}`
+      );
+      if (!taskResponse.ok) {
+        throw new Error("Cannot fetch the task");
       }
-    });
+      const task = await taskResponse.json();
+      const isCompleted = task.isCompleted;
+
+      const response = await fetch(
+        `https://658a8a68ba789a9622374750.mockapi.io/tasks/${id}`,
+        {
+          method: "PUT",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ isCompleted: !isCompleted }),
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        renderTasks();
+      }
+    } catch (err) {
+      console.log("Error occured while updating the task" + err.message);
+    }
   };
 
   // FOR THE INPUT FORM
@@ -162,19 +211,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const descriptionInputValue = descriptionInputField.value.trim();
         const dateInputValue = dateInputField.value.trim();
         if (descriptionInputValue !== "" && dateInputValue !== "") {
-          // Add a new task at the beginning of the tasks array
-          tasks.unshift({
-            id: tasks.length + 1,
+          const newTask = {
             description: descriptionInputValue,
             dueDate: dateInputValue,
             isCompleted: false,
-          });
-
-          localStorage.setItem("task-list", JSON.stringify(tasks));
-
-          // Re-render the updated tasks
-          renderTasks();
-          console.log(tasks);
+          };
+          addTask(newTask);
 
           descriptionInputField.value = "";
           inputForm.remove();
@@ -188,10 +230,28 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  const addTask = async (task) => {
+    try {
+      const response = await fetch(
+        "https://658a8a68ba789a9622374750.mockapi.io/tasks",
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(task),
+        }
+      );
+      const data = await response.json();
+      console.log(data);
+      renderTasks();
+    } catch (err) {
+      console.log("Error occured:" + err.message);
+    }
+  };
+
   const deleteAllButton = document.getElementById("delete_All");
   deleteAllButton.addEventListener("click", function () {
     tasks = [];
-    localStorage.setItem("task-list", JSON.stringify(tasks));
+    // localStorage.setItem("task-list", JSON.stringify(tasks));
     renderTasks();
   });
 
@@ -227,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
   searchBar.addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
       if (e.target.value === "") {
-        tasks = JSON.parse(localStorage.getItem("task-list")) || [];
+        // tasks = JSON.parse(localStorage.getItem("task-list")) || [];
         renderTasks();
       }
 
