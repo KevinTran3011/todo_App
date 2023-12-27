@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
   let sortButton = document.getElementById("sort_button");
   const list = document.querySelector("#todo_list");
 
@@ -11,7 +11,10 @@ document.addEventListener("DOMContentLoaded", function () {
     return `${day}/${month}/${year}`;
   };
 
-  const tasks = async () => {
+  let tasks = [];
+  let originalTasks = [];
+
+  const getTasks = async () => {
     try {
       const response = await fetch(
         "https://658a8a68ba789a9622374750.mockapi.io/tasks",
@@ -65,13 +68,19 @@ document.addEventListener("DOMContentLoaded", function () {
     return newTodoItem;
   };
 
+  try {
+    originalTasks = await getTasks();
+    tasks = [...originalTasks];
+  } catch (error) {
+    console.error("Error fetching tasks:", error.message);
+  }
+
   const renderTasks = async () => {
     try {
-      const tasksData = await tasks();
       const list = document.querySelector("#todo_list");
       list.innerHTML = "";
 
-      tasksData
+      tasks
         .slice()
         .reverse()
         .forEach((task) => {
@@ -115,6 +124,7 @@ document.addEventListener("DOMContentLoaded", function () {
       );
       const data = await response.json();
       console.log(data);
+      tasks = tasks.filter((task) => task.id !== id);
       renderTasks();
     } catch (err) {
       console.log("Error occured while deleting the task" + err.message);
@@ -123,13 +133,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const completeTask = async (id) => {
     try {
-      const taskResponse = await fetch(
+      const selectedTask = await fetch(
         `https://658a8a68ba789a9622374750.mockapi.io/tasks/${id}`
       );
-      if (!taskResponse.ok) {
+      if (!selectedTask.ok) {
         throw new Error("Cannot fetch the task");
       }
-      const task = await taskResponse.json();
+      const task = await selectedTask.json();
       const isCompleted = task.isCompleted;
 
       const response = await fetch(
@@ -141,8 +151,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       );
       if (response.ok) {
-        const data = await response.json();
-        console.log(data);
+        const updatedTask = await response.json();
+        console.log(updatedTask);
+        tasks = tasks.map((task) =>
+          task.id === updatedTask.id ? updatedTask : task
+        );
         renderTasks();
       }
     } catch (err) {
@@ -242,6 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
       );
       const data = await response.json();
       console.log(data);
+      tasks.push(data);
       renderTasks();
     } catch (err) {
       console.log("Error occured:" + err.message);
@@ -251,52 +265,45 @@ document.addEventListener("DOMContentLoaded", function () {
   const deleteAllButton = document.getElementById("delete_All");
   deleteAllButton.addEventListener("click", function () {
     tasks = [];
-    // localStorage.setItem("task-list", JSON.stringify(tasks));
     renderTasks();
   });
 
-  // SORT BY DATE TIME CLOSEST TO THE CURRENT DATE
+  // SORT BY DATE TIME
+
   let isSorted = false;
-  sortButton.addEventListener("click", function () {
-    if (isSorted) {
-      tasks = tasks.reverse();
-      isSorted = false;
-    } else {
-      tasks = tasks.sort((a, b) => {
-        let date1 = new Date(a.dueDate);
-        let date2 = new Date(b.dueDate);
-
-        if (date1 > date2) {
-          return 1;
-        } else if (date1 < date2) {
-          return -1;
-        }
-
-        return 0;
-      });
-
+  sortButton.addEventListener("click", async function () {
+    if (!isSorted) {
+      tasks = sortFunction([...tasks]); // create a copy of tasks before sorting
+      renderTasks();
       isSorted = true;
+    } else {
+      tasks = [...originalTasks];
+      renderTasks();
+      isSorted = false;
     }
-
-    renderTasks();
   });
+
+  // Adjusted sort function using localeCompare
+
+  const sortFunction = (tasks) => {
+    return tasks.sort((a, b) => new Date(b.dueDate) - new Date(a.dueDate));
+  };
 
   // FOR THE SEARCH BAR
 
   const searchBar = document.getElementById("search-Bar");
-  searchBar.addEventListener("keypress", (e) => {
+  searchBar.addEventListener("keypress", async (e) => {
     if (e.key === "Enter") {
-      if (e.target.value === "") {
-        // tasks = JSON.parse(localStorage.getItem("task-list")) || [];
-        renderTasks();
-      }
-
       const searchString = e.target.value.toLowerCase();
-      const filteredTasks = tasks.filter((task) => {
-        return task.description.toLowerCase().includes(searchString);
-      });
-      tasks = filteredTasks;
+      tasks =
+        searchString === "" ? [...originalTasks] : searchFunction(searchString);
       renderTasks();
     }
   });
+
+  const searchFunction = (searchString) => {
+    return originalTasks.filter((task) =>
+      task.description.toLowerCase().includes(searchString)
+    );
+  };
 });
