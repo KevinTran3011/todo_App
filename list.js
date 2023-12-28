@@ -299,23 +299,24 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   };
   // DELETE ALL TASKS
-  const deleteAll = async () => {
+  const deleteAll = async (tasks) => {
     try {
       showLoading();
-      const deleteTasks = tasks.map((task) =>
-        fetch(`https://658a8a68ba789a9622374750.mockapi.io/tasks/${task.id}`, {
-          method: "DELETE",
-          headers: { "content-type": "application/json" },
-        })
+      await Promise.all(
+        tasks.map((task) =>
+          fetch(
+            `https://658a8a68ba789a9622374750.mockapi.io/tasks/${task.id}`,
+            {
+              method: "DELETE",
+              headers: { "content-type": "application/json" },
+            }
+          ).then((response) => {
+            if (!response.ok) {
+              throw new Error(`Failed to delete task with id ${task.id}`);
+            }
+          })
+        )
       );
-
-      const responses = await Promise.all(deleteTasks);
-
-      responses.forEach((response, index) => {
-        if (!response.ok) {
-          throw new Error(`Failed to delete task with id ${tasks[index].id}`);
-        }
-      });
 
       const updatedResponse = await fetch(
         `https://658a8a68ba789a9622374750.mockapi.io/tasks/`,
@@ -334,7 +335,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   };
   const deleteAllButton = document.getElementById("delete_All");
   deleteAllButton.addEventListener("click", function () {
-    deleteAll();
+    deleteAll(tasks);
   });
 
   // SORT BY DATE TIME
