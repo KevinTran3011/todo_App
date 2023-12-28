@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   };
 
   let tasks = [];
-  let originalTasks = [];
 
   const getTasks = async () => {
     try {
@@ -33,9 +32,15 @@ document.addEventListener("DOMContentLoaded", async function () {
       return data;
     } catch (error) {
       console.error(error.message);
-      throw error; // rethrow the error to handle it at a higher level if needed
+      throw error;
     }
   };
+
+  try {
+    tasks = await getTasks();
+  } catch (error) {
+    console.error("Error fetching tasks:", error.message);
+  }
 
   const renderTodoItem = (id, description, dueDate, isCompleted) => {
     const newTodoItem = document.createElement("li");
@@ -68,14 +73,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     return newTodoItem;
   };
 
-  try {
-    originalTasks = await getTasks();
-    tasks = [...originalTasks];
-  } catch (error) {
-    console.error("Error fetching tasks:", error.message);
-  }
-
-  const renderTasks = async () => {
+  const renderTasks = async (tasks) => {
     try {
       const list = document.querySelector("#todo_list");
       list.innerHTML = "";
@@ -112,8 +110,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   };
 
-  renderTasks();
-
+  renderTasks(tasks);
   const deleteTask = async (id) => {
     try {
       const response = await fetch(
@@ -124,8 +121,15 @@ document.addEventListener("DOMContentLoaded", async function () {
       );
       const data = await response.json();
       console.log(data);
-      tasks = tasks.filter((task) => task.id !== id);
-      renderTasks();
+      const updatedResponse = await fetch(
+        `https://658a8a68ba789a9622374750.mockapi.io/tasks/`,
+        {
+          method: "GET",
+          headers: { "content-type": "application/json" },
+        }
+      );
+      tasks = await updatedResponse.json();
+      renderTasks(tasks);
     } catch (err) {
       console.log("Error occured while deleting the task" + err.message);
     }
@@ -145,10 +149,19 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (response.ok) {
         const updatedTask = await response.json();
         console.log(updatedTask);
-        tasks = tasks.map((task) =>
-          task.id === updatedTask.id ? updatedTask : task
+        // tasks = tasks.map((task) =>
+        //   task.id === updatedTask.id ? updatedTask : task
+        // );
+
+        const updatedResponse = await fetch(
+          `https://658a8a68ba789a9622374750.mockapi.io/tasks/`,
+          {
+            method: "GET",
+            headers: { "content-type": "application/json" },
+          }
         );
-        renderTasks();
+        tasks = await updatedResponse.json();
+        renderTasks(tasks);
       }
     } catch (err) {
       console.log("Error occured while updating the task" + err.message);
@@ -248,7 +261,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       const data = await response.json();
       console.log(data);
       tasks.unshift(data);
-      renderTasks();
+      renderTasks(tasks);
     } catch (err) {
       console.log("Error occured:" + err.message);
     }
@@ -269,7 +282,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
       }
       tasks = [];
-      renderTasks();
     } catch (err) {
       console.log("Error occurred while deleting all tasks: " + err.message);
     }
@@ -281,15 +293,17 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // SORT BY DATE TIME
 
+  let originalTasks = [...tasks];
+
   let isSorted = false;
   sortButton.addEventListener("click", async function () {
     if (!isSorted) {
-      tasks = sortFunction([...tasks]);
-      renderTasks();
+      originalTasks = sortFunction([...originalTasks]);
+      renderTasks(originalTasks);
       isSorted = true;
     } else {
-      tasks = [...originalTasks];
-      renderTasks();
+      originalTasks = [...tasks];
+      renderTasks(originalTasks);
       isSorted = false;
     }
   });
@@ -299,19 +313,18 @@ document.addEventListener("DOMContentLoaded", async function () {
   };
 
   // FOR THE SEARCH BAR
-
   const searchBar = document.getElementById("search-Bar");
   searchBar.addEventListener("keypress", async (e) => {
     if (e.key === "Enter") {
       const searchString = e.target.value.toLowerCase();
-      tasks =
-        searchString === "" ? [...originalTasks] : searchFunction(searchString);
-      renderTasks();
+      originalTasks =
+        searchString === "" ? [...tasks] : searchFunction(searchString);
+      renderTasks(originalTasks);
     }
   });
 
   const searchFunction = (searchString) => {
-    return originalTasks.filter((task) =>
+    return tasks.filter((task) =>
       task.description.toLowerCase().includes(searchString)
     );
   };
