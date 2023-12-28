@@ -11,10 +11,33 @@ document.addEventListener("DOMContentLoaded", async function () {
     return `${day}/${month}/${year}`;
   };
 
+  // FOR THE LOADING PAGE
+
+  let loadingText;
+
+  const showLoading = () => {
+    isLoading = true;
+    loadingText = document.createElement("div");
+    loadingText.innerHTML = `
+        <div class = 'spinner_container'>
+          <div class = 'spinner'>Updating Task</div>
+        </div>
+      `;
+    document.body.appendChild(loadingText);
+  };
+
+  const hideLoading = () => {
+    isLoading = false;
+    if (loadingText && loadingText.parentNode === document.body) {
+      document.body.removeChild(loadingText);
+    }
+  };
+
   let tasks = [];
 
   const getTasks = async () => {
     try {
+      showLoading();
       const response = await fetch(
         "https://658a8a68ba789a9622374750.mockapi.io/tasks",
         {
@@ -73,28 +96,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     return newTodoItem;
   };
 
-  // FOR THE LOADING PAGE
-
-  let loadingText;
-
-  const showLoading = () => {
-    isLoading = true;
-    loadingText = document.createElement("div");
-    loadingText.innerHTML = `
-      <div class = 'spinner_container'>
-        <div class = 'spinner'>Updating Task</div>
-      </div>
-    `;
-    document.body.appendChild(loadingText);
-  };
-
-  const hideLoading = () => {
-    isLoading = false;
-    if (loadingText) {
-      document.body.removeChild(loadingText);
-    }
-  };
-
   const renderTasks = async (tasks) => {
     try {
       const list = document.querySelector("#todo_list");
@@ -129,6 +130,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     } catch (error) {
       console.error("Error rendering tasks:", error.message);
+    } finally {
+      hideLoading();
     }
   };
 
@@ -276,6 +279,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   const addTask = async (task) => {
     try {
+      showLoading();
       const response = await fetch(
         "https://658a8a68ba789a9622374750.mockapi.io/tasks",
         {
@@ -290,26 +294,42 @@ document.addEventListener("DOMContentLoaded", async function () {
       renderTasks(tasks);
     } catch (err) {
       console.log("Error occured:" + err.message);
+    } finally {
+      hideLoading();
     }
   };
   // DELETE ALL TASKS
   const deleteAll = async () => {
     try {
-      for (const task of tasks) {
-        const response = await fetch(
-          `https://658a8a68ba789a9622374750.mockapi.io/tasks/${task.id}`,
-          {
-            method: "DELETE",
-            headers: { "content-type": "application/json" },
-          }
-        );
+      showLoading();
+      const deleteTasks = tasks.map((task) =>
+        fetch(`https://658a8a68ba789a9622374750.mockapi.io/tasks/${task.id}`, {
+          method: "DELETE",
+          headers: { "content-type": "application/json" },
+        })
+      );
+
+      const responses = await Promise.all(deleteTasks);
+
+      responses.forEach((response, index) => {
         if (!response.ok) {
-          throw new Error(`Failed to delete task with id ${task.id}`);
+          throw new Error(`Failed to delete task with id ${tasks[index].id}`);
         }
-      }
-      tasks = [];
+      });
+
+      const updatedResponse = await fetch(
+        `https://658a8a68ba789a9622374750.mockapi.io/tasks/`,
+        {
+          method: "GET",
+          headers: { "content-type": "application/json" },
+        }
+      );
+      tasks = await updatedResponse.json();
+      renderTasks(tasks);
     } catch (err) {
       console.log("Error occurred while deleting all tasks: " + err.message);
+    } finally {
+      hideLoading();
     }
   };
   const deleteAllButton = document.getElementById("delete_All");
@@ -319,18 +339,33 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // SORT BY DATE TIME
 
-  let originalTasks = [...tasks];
-
   let isSorted = false;
   sortButton.addEventListener("click", async function () {
-    if (!isSorted) {
-      originalTasks = sortFunction([...originalTasks]);
-      renderTasks(originalTasks);
-      isSorted = true;
-    } else {
-      originalTasks = [...tasks];
-      renderTasks(originalTasks);
-      isSorted = false;
+    try {
+      showLoading();
+      const updatedResponse = await fetch(
+        `https://658a8a68ba789a9622374750.mockapi.io/tasks/`,
+        {
+          method: "GET",
+          headers: { "content-type": "application/json" },
+        }
+      );
+      tasks = await updatedResponse.json();
+      let originalTasks = [...tasks];
+
+      if (!isSorted) {
+        originalTasks = sortFunction([...originalTasks]);
+        renderTasks(originalTasks);
+        isSorted = true;
+      } else {
+        originalTasks = [...tasks];
+        renderTasks(originalTasks);
+        isSorted = false;
+      }
+    } catch (err) {
+      console.log("Error occured while sorting the tasks" + err.message);
+    } finally {
+      hideLoading();
     }
   });
 
