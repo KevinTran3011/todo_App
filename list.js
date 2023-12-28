@@ -73,6 +73,28 @@ document.addEventListener("DOMContentLoaded", async function () {
     return newTodoItem;
   };
 
+  // FOR THE LOADING PAGE
+
+  let loadingText;
+
+  const showLoading = () => {
+    isLoading = true;
+    loadingText = document.createElement("div");
+    loadingText.innerHTML = `
+      <div class = 'spinner_container'>
+        <div class = 'spinner'>Updating Task</div>
+      </div>
+    `;
+    document.body.appendChild(loadingText);
+  };
+
+  const hideLoading = () => {
+    isLoading = false;
+    if (loadingText) {
+      document.body.removeChild(loadingText);
+    }
+  };
+
   const renderTasks = async (tasks) => {
     try {
       const list = document.querySelector("#todo_list");
@@ -113,6 +135,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   renderTasks(tasks);
   const deleteTask = async (id) => {
     try {
+      showLoading();
+
       const response = await fetch(
         `https://658a8a68ba789a9622374750.mockapi.io/tasks/${id}`,
         {
@@ -132,19 +156,14 @@ document.addEventListener("DOMContentLoaded", async function () {
       renderTasks(tasks);
     } catch (err) {
       console.log("Error occured while deleting the task" + err.message);
+    } finally {
+      hideLoading();
     }
   };
 
   const completeTask = async (task) => {
-    const loadingText = document.createElement("div");
-    loadingText.innerHTML = `
-      <div class = 'spinner_container'>
-        <div class = 'spinner'>Updating Task</div>
-      </div>
-    `;
-    document.body.appendChild(loadingText);
-
     try {
+      showLoading();
       const { id, isCompleted } = task;
       const response = await fetch(
         `https://658a8a68ba789a9622374750.mockapi.io/tasks/${id}`,
@@ -171,7 +190,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     } catch (err) {
       console.log("Error occured while updating the task" + err.message);
     } finally {
-      document.body.removeChild(loadingText);
+      hideLoading();
     }
   };
 
