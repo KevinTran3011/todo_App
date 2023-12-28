@@ -136,6 +136,14 @@ document.addEventListener("DOMContentLoaded", async function () {
   };
 
   const completeTask = async (task) => {
+    const loadingText = document.createElement("div");
+    loadingText.innerHTML = `
+      <div class = 'spinner_container'>
+        <div class = 'spinner'>Updating Task</div>
+      </div>
+    `;
+    document.body.appendChild(loadingText);
+
     try {
       const { id, isCompleted } = task;
       const response = await fetch(
@@ -149,9 +157,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       if (response.ok) {
         const updatedTask = await response.json();
         console.log(updatedTask);
-        // tasks = tasks.map((task) =>
-        //   task.id === updatedTask.id ? updatedTask : task
-        // );
 
         const updatedResponse = await fetch(
           `https://658a8a68ba789a9622374750.mockapi.io/tasks/`,
@@ -165,6 +170,8 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
     } catch (err) {
       console.log("Error occured while updating the task" + err.message);
+    } finally {
+      document.body.removeChild(loadingText);
     }
   };
 
